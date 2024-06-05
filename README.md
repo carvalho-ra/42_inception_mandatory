@@ -21,7 +21,3 @@ Copy base files to folder of choice
 Run setup using the provided Makefile: ```make setup```. Machine will reboot after that!
 
 Run project using the provided Makefile: ```make```
-
-### 📋 Results
-
-<img src="inception.png" alt="Inception Results" width="800">
