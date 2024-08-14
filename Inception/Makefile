@@ -15,23 +15,27 @@ sudoers:
 
 docker: sudoers
 	@sleep 3
-	@echo "\nInstalling Docker..."
-	sudo apt install -y docker docker-compose filezilla
-	sudo usermod -aG docker $(USER)
-	@echo "\nDocker installed successfully!"
+	@echo "Installing Docker..."
+	@sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+	@sudo usermod -aG docker $(USER)
+	@echo "Docker installed successfully!"
 	@echo "User $(USERNAME) added to Docker group."
+	@echo "Installing Filezilla..."
+	@sudo apt install filezilla
+	@echo "Filezilla installed successfully!"
+
 	
 certs:
 	@sleep 3
-	@echo "\nDownloading and installing mkcert..."
-	sudo apt install libnss3-tools mkcert -y
-	@echo "\nmkcert installed successfully."
+	@echo "Downloading and installing mkcert..."
+	@sudo apt install libnss3-tools mkcert -y
+	@echo "mkcert installed successfully."
 	@echo "Updating packages..."
-	sudo apt-get update
-	mkcert -key-file srcs/requirements/nginx/tools/$(USERNAME).42.fr.key -cert-file srcs/requirements/nginx/tools/$(USERNAME).42.fr.crt https://$(USERNAME).42.fr
-	@echo "\nCertificates created successfully."
+	@sudo apt-get update
+	@mkcert -key-file srcs/requirements/nginx/tools/$(USERNAME).42.fr.key -cert-file srcs/requirements/nginx/tools/$(USERNAME).42.fr.crt https://$(USERNAME).42.fr
+	@echo "Certificates created successfully."
 	@echo "\n# Inception Routes\n127.0.0.1       $(USERNAME).42.fr\n$(cat /etc/hosts)" | sudo tee -a /etc/hosts
-	@echo "\nRoutes created successfully."
+	@echo "Routes created successfully."
 	
 env:
 	../create_env.sh
@@ -42,28 +46,28 @@ info:
 all:
 	@printf "Launching ${name}...\n"
 	@bash srcs/requirements/wordpress/tools/make_dir.sh
-	@docker-compose -f ./srcs/docker-compose.yml --env-file srcs/.env up -d --build
+	@docker compose -f ./srcs/docker-compose.yml --env-file srcs/.env up -d --build
 	@sudo chmod -R 777 ~/data
 
 build:
 	@printf "Building  ${name}...\n"
 	@bash srcs/requirements/wordpress/tools/make_dir.sh
-	@docker-compose -f ./srcs/docker-compose.yml --env-file srcs/.env build
+	@docker compose -f ./srcs/docker-compose.yml --env-file srcs/.env build
 	@sudo chmod -R 777 ~/data
 
 down:
 	@printf "Stopping ${name}...\n"
-	@docker-compose -f ./srcs/docker-compose.yml --env-file srcs/.env down
+	@docker compose -f ./srcs/docker-compose.yml --env-file srcs/.env down
 
 re: fclean env certs
 	@printf "Rebuilding  ${name}...\n"
 	@bash srcs/requirements/wordpress/tools/make_dir.sh
-	@docker-compose -f ./srcs/docker-compose.yml --env-file srcs/.env up -d --build
+	@docker compose -f ./srcs/docker-compose.yml --env-file srcs/.env up -d --build
 	@sudo chmod -R 777 ~/data
 
 clean: down
 	@printf "Cleaning  ${name}...\n"
-	@docker-compose -f ./srcs/docker-compose.yml --env-file srcs/.env down --volumes
+	@docker compose -f ./srcs/docker-compose.yml --env-file srcs/.env down --volumes
 	@docker container prune --force
 	@docker image prune --force
 	@sudo rm -rf ~/data/mariadb/*
@@ -71,7 +75,7 @@ clean: down
 
 fclean: down
 	@printf "Clean of all docker configs\n"
-	@docker-compose -f ./srcs/docker-compose.yml --env-file srcs/.env down --volumes
+	@docker compose -f ./srcs/docker-compose.yml --env-file srcs/.env down --volumes
 	@docker image prune --all --force
 	@docker system prune --all --force --volumes
 	@docker network prune --force
