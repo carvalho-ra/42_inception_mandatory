@@ -40,8 +40,6 @@ certs:
 	@echo "Downloading and installing mkcert..."
 	@sudo apt install libnss3-tools mkcert -y
 	@echo "mkcert installed successfully."
-	@echo "Updating packages..."
-	@sudo apt-get update
 	@mkcert -key-file srcs/requirements/nginx/tools/$(USERNAME).42.fr.key -cert-file srcs/requirements/nginx/tools/$(USERNAME).42.fr.crt https://$(USERNAME).42.fr
 	@echo "Certificates created successfully."
 	@echo "\n# Inception Routes\n127.0.0.1       $(USERNAME).42.fr\n$(cat /etc/hosts)" | sudo tee -a /etc/hosts
