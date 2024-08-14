@@ -16,15 +16,29 @@ sudoers:
 docker: sudoers
 	@sleep 3
 	@echo "Installing Docker..."
+	
+	@echo "Adding Docker's official GPG key..."
+	@sudo apt update
+	@sudo apt install -y ca-certificates curl
+	@sudo install -m 0755 -d /etc/apt/keyrings
+	@sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+	@sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+	@echo "Creating Docker repository file..."
+	@echo "deb [arch=$$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $$(. /etc/os-release && echo $$VERSION_CODENAME) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+	@echo "Installing Docker packages..."
 	@sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 	@sudo usermod -aG docker $(USER)
 	@echo "Docker installed successfully!"
-	@echo "User $(USERNAME) added to Docker group."
-	@echo "Installing Filezilla..."
-	@sudo apt install filezilla
-	@echo "Filezilla installed successfully!"
+	@echo "User $(USER) added to Docker group."
 
+	@echo "Installing Filezilla..."
+	@sudo apt install -y filezilla
+	@echo "Filezilla installed successfully!"
 	
+	@sudo apt autoremove -y
+
 certs:
 	@sleep 3
 	@echo "Downloading and installing mkcert..."
